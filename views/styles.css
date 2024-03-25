@@ -1,0 +1,72 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  margin: 10;
+  padding: 0;
+}
+
+h1 {
+  text-align: center;
+}
+
+/* Estilos para el contenedor de tarjetas */
+.breeds-container {
+  display: flex;
+  flex-wrap: wrap; /* Cambiar el envoltorio a flex */
+  overflow-x: hidden; /* Ocultar la barra de desplazamiento horizontal */
+  padding: 20px;
+}
+.card-row {
+  display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    align-content: stretch;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}
+
+.card {
+  flex: 0 0 calc(14.28% - 20px); /* Ancho de cada tarjeta, con un margen de 20px entre ellas */
+  height: 150px; /* Altura de cada tarjeta */
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  margin-right: 20px; /* Margen entre tarjetas */
+  margin-bottom: 20px; /* Margen inferior entre tarjetas */
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+/* Estilos para las flechas de navegación */
+.navigation-arrows {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn {
+  cursor: pointer;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff; /* Azul */
+  color: white;
+}
+
+.btn:hover {
+  background-color: #0056b3; /* Azul oscuro */
+}
+.filter-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #007bff; /* Cambia el color del borde al enfocar el filtro */
+}

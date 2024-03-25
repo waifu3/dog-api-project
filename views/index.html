@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Listado de razas y subrazas encontrados en la BD</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="https://code.jquery.com/qunit/qunit-2.16.0.css"/>
+    <script src="tests.js"></script>
+
+  </head>
+  <body>
+    <h1>Listado de razas y subrazas encontrados en la BD</h1>
+    <p id="total-info"></p>
+    <!-- Párrafo para mostrar el total -->
+
+    <input
+      type="text"
+      id="filter-input"
+      placeholder="Buscar raza..."
+      class="filter-input"
+    />
+
+    <button id="asc-btn" class="btn btn-primary">Orden Ascendente</button>
+    <button id="desc-btn" class="btn btn-primary">Orden Descendente</button>
+    <button id="random-image-btn" class="btn btn-primary">
+      Obtener Imagen Aleatoria
+    </button>
+
+    <div id="breeds-info" class="breeds-container">
+      <!-- Contenedor de filas de tarjetas -->
+      <div class="card-row">
+        <!-- Tarjetas -->
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+      let breedsInfo; // Define breedsInfo en el ámbito global
+
+      axios
+        .get("/razas")
+        .then((response) => {
+          breedsInfo = response.data.breeds; // Asignar response.data.breeds a breedsInfo
+          const { totalBreeds, totalSubBreeds, breeds } = response.data;
+
+          // Actualiza el contenido del párrafo con los totales de razas y subrazas
+          const totalInfoParagraph = document.getElementById("total-info");
+          totalInfoParagraph.textContent = `Total de razas: ${totalBreeds}, Total de subrazas: ${totalSubBreeds}`;
+
+          // Llama a la función para renderizar las tarjetas
+          renderBreedsList(breeds);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+
+      // Filtrar razas y subrazas por nombre
+      const filterInput = document.getElementById("filter-input");
+      filterInput.addEventListener("input", () => {
+        const filterValue = filterInput.value.toLowerCase();
+        const breedLinks = document.querySelectorAll("#breeds-info a"); // Selecciona los enlaces dentro del contenedor de razas
+        breedLinks.forEach((link) => {
+          const breedName = link.textContent.toLowerCase();
+          const listItem = link.parentElement;
+          if (breedName.includes(filterValue)) {
+            listItem.style.display = "block";
+          } else {
+            listItem.style.display = "none";
+          }
+        });
+      });
+
+      // Event listener para el botón "Obtener Imagen Aleatoria"
+      const randomImageBtn = document.getElementById("random-image-btn");
+      randomImageBtn.addEventListener("click", async () => {
+        try {
+          const response = await axios.get(
+            "https://dog.ceo/api/breeds/image/random"
+          );
+          const imageUrl = response.data.message;
+          console.log("URL de la imagen aleatoria:", imageUrl);
+
+          // Abrir la URL de la imagen en una nueva pestaña
+          window.open(imageUrl);
+        } catch (error) {
+          console.error("Error al obtener la imagen aleatoria:", error);
+        }
+      });
+
+      // Funciones que manejan los botones de orden ascendente y descendente
+      const ascBtn = document.getElementById("asc-btn");
+      const descBtn = document.getElementById("desc-btn");
+
+      ascBtn.addEventListener("click", () => {
+        let sortedBreedsInfo = sortObjectByKey(breedsInfo, "asc");
+        renderBreedsList(sortedBreedsInfo);
+      });
+
+      descBtn.addEventListener("click", () => {
+        let sortedBreedsInfo = sortObjectByKey(breedsInfo, "desc");
+        renderBreedsList(sortedBreedsInfo);
+      });
+
+      // Función para ordenar un objeto por clave ascendente o descendente
+      function sortObjectByKey(obj, order) {
+        const sorted = {};
+        const keys = Object.keys(obj); // Obtener las claves del objeto
+
+        // Ordenar las claves en orden ascendente o descendente
+        const sortedKeys =
+          order === "asc" ? keys.sort() : keys.sort().reverse();
+
+        // Recorrer las claves ordenadas y construir el objeto ordenado
+        sortedKeys.forEach((key) => {
+          sorted[key] = obj[key];
+        });
+
+        return sorted;
+      }
+
+      function renderBreedsList(breeds) {
+        const breedsContainer = document.getElementById("breeds-info");
+
+        if (breedsContainer) {
+          breedsContainer.innerHTML = ""; // Limpiar el contenido del contenedor
+
+          // Recorrer las razas y subrazas y agregarlas como tarjetas al contenedor
+          for (const breed in breeds) {
+            if (breeds.hasOwnProperty(breed)) {
+              const card = document.createElement("div");
+              card.className = "card";
+
+              // Crear un enlace que redirija a la página con la foto del perro correspondiente a esta raza
+              const link = document.createElement("a");
+              link.href = `/breed/${breed}`; // Reemplaza esta URL con la ruta correcta de tu aplicación
+              link.textContent = breed; // Aquí puedes establecer el texto del enlace si lo deseas
+
+              // Agregar el enlace a la tarjeta
+              card.appendChild(link);
+
+              // Si hay subrazas, agregarlas como texto dentro de la tarjeta
+              if (breeds[breed].length > 0) {
+                const subBreedsText = document.createElement("div");
+                subBreedsText.textContent = `Subrazas: ${breeds[breed].join(
+                  ", "
+                )}`;
+                card.appendChild(subBreedsText);
+              }
+
+              // Agregar la tarjeta al contenedor
+              breedsContainer.appendChild(card);
+            }
+          }
+        } else {
+          console.error("Elemento breeds-info no encontrado en el DOM.");
+        }
+      }
+    </script>
+
+    <!-- Scripts para QUnit -->
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="https://code.jquery.com/qunit/qunit-2.16.0.js"></script>
+  </body>
+</html>
